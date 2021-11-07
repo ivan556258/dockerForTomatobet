@@ -1,0 +1,93 @@
+version: "3.7"
+services:
+
+#Laravel App
+  app:
+    build:
+      args:
+        user: maruan
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: laravel-app
+    container_name: php
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./application:/var/www
+    networks:
+      - mynetwork
+    
+ #Nginx Service
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    volumes:
+      - ./application:/var/www
+      - ./nginx/conf.d:/etc/nginx/conf.d/
+    networks:
+      - mynetwork
+  #Mysl Service
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+    networks:
+      - mynetwork
+
+  postgres:
+    image: postgres
+    container_name: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_ROOT_PASSWORD: example
+    networks:
+      - mynetwork
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    networks:
+      - mynetwork
+
+  redis:  
+    image: redis
+    container_name: redis
+    volumes:
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+    ports:
+      - "6379"
+    networks:
+      - mynetwork
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    volumes:
+      - ./.docker/rabbitmq/etc/:/etc/rabbitmq/
+      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+    environment:
+        RABBITMQ_ERLANG_COOKIE: eww
+        RABBITMQ_DEFAULT_USER: admin
+        RABBITMQ_DEFAULT_PASS: admin
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - mynetwork
+      
+networks:
+  mynetwork:
+    driver: bridge
