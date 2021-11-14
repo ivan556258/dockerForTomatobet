@@ -47,18 +47,18 @@ services:
     networks:
       - mynetwork
 
- #Mysl Service
-  mysql:
-    image: mysql:8
-    container_name: mysql
-    restart: unless-stopped
-    environment:
-      MYSQL_DATABASE: ${DB_DATABASE}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_PASSWORD: ${DB_PASSWORD}
-      MYSQL_USER: ${DB_USERNAME}
-    networks:
-      - mynetwork
+  #Mysl Service
+  #  mysql:
+  #    image: mysql:8
+  #   container_name: mysql
+  #    restart: unless-stopped
+  #    environment:
+  #      MYSQL_DATABASE: ${DB_DATABASE}
+  #      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+  #      MYSQL_PASSWORD: ${DB_PASSWORD}
+  #      MYSQL_USER: ${DB_USERNAME}
+  #    networks:
+  #      - mynetwork
 
   postgres:
     image: postgres
