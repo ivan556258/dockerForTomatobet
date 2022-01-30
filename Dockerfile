@@ -1,8 +1,10 @@
-FROM php:7.4-fpm
+FROM php:8.1-fpm
 
 # Arguments defined in docker-compose.yml
 ARG user
 ARG uid
+
+RUN apt-get update && apt-get install -y git unzip zip
 
 # Install system dependencies
 RUN buildDeps="libpq-dev libzip-dev libicu-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libmagickwand-6.q16-dev libxslt-dev" && \
@@ -20,11 +22,18 @@ RUN buildDeps="libpq-dev libzip-dev libicu-dev libpng-dev libjpeg62-turbo-dev li
         pgsql \
         sockets \
         xsl \
-        intl 
-
+        intl \
+	gd
 
 # Clear cache
+
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
+
+RUN apt-get update -yq \
+    && apt-get install curl gnupg -yq \
+    && curl -sL https://deb.nodesource.com/setup_12.x | bash \
+    && apt-get install nodejs -yq 
 
 # Get latest Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
