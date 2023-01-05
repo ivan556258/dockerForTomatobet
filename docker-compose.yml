@@ -8,7 +8,7 @@ services:
         user: maruan
         uid: 1000
       context: ./
-      dockerfile: Dockerfile
+      dockerfile: ./php/Dockerfile
     image: laravel-app
     container_name: php
     restart: unless-stopped
@@ -61,12 +61,13 @@ services:
   #      - mynetwork
 
   postgres:
-    image: postgres
+    image: 'postgres:13.4'
+    environment:
+      POSTGRES_DB: tomato
+      POSTGRES_USER: tomato
+      POSTGRES_PASSWORD: 1234
     container_name: postgres
     restart: always
-    environment:
-      POSTGRES_PASSWORD: example
-      POSTGRES_ROOT_PASSWORD: example
     networks:
       - mynetwork
 
@@ -78,13 +79,28 @@ services:
     networks:
       - mynetwork
 
-  redis:
-    image: redis
-    container_name: redis
+#  redis:
+#    image: redis
+#    container_name: redis
+#    volumes:
+#      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+#    ports:
+#      - "6379"
+#    networks:
+#      - mynetwork
+
+  keydb:
+    image: eqalpha/keydb:x86_64_v5.3.3
+    container_name: keydb
+    # command: keydb-server /etc/keydb/redis.conf --server-threads 2 --active-replica yes --replicaof 192.168.1.1 6379
+    # command: keydb-server /etc/keydb/redis.conf --server-threads 2 --active-replica yes --replicaof 192.168.1.2 6379
+    command: keydb-server /etc/keydb/redis.conf --server-threads 2
     volumes:
-      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf
+      - ./redis/redis.conf:/etc/keydb/redis.conf
+      - ./data:/data
     ports:
-      - "6379"
+      - 6380:6379
+    restart: unless-stopped
     networks:
       - mynetwork
 
